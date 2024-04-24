@@ -1,7 +1,20 @@
+const config = {
+    'lineSize': 5,
+    'color': 'black'
+}
 window.onload = function() {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const indicator = document.getElementById('indicator');
+    
+    canvas.setAttribute('width', window.innerWidth);
+    canvas.setAttribute('height', window.innerHeight);
+
+    ctx.lineWidth = config.lineSize;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = config.color;
+    ctx.fillStyle = config.color;
 
     document.ontouchmove = function(e){ e.preventDefault(); }
     var canvastop = canvas.offsetTop
@@ -10,11 +23,6 @@ window.onload = function() {
   
     var lastx;
     var lasty;
-  
-    context.strokeStyle = "#000000";
-    context.lineCap = 'round';
-    context.lineJoin = 'round';
-    context.lineWidth = 5;
   
     function clear() {
       context.fillStyle = "#ffffff";
