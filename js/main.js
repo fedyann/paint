@@ -2,75 +2,81 @@ const config = {
     'lineSize': 5,
     'color': 'black'
 }
-window.onload = function() {
+
+window.onload = () => {
+
+    // Инициализируем html элементы
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const indicator = document.getElementById('indicator');
-    
+
+    // Устанавливаем размер холста
     canvas.setAttribute('width', window.innerWidth);
     canvas.setAttribute('height', window.innerHeight);
 
+    // Инициализируем стиль кисти
     ctx.lineWidth = config.lineSize;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     ctx.strokeStyle = config.color;
     ctx.fillStyle = config.color;
 
-    document.ontouchmove = function(e){ e.preventDefault(); }
-    var canvastop = canvas.offsetTop
-  
-    var context = canvas.getContext("2d");
-  
-    var lastx;
-    var lasty;
-  
-    function clear() {
-      context.fillStyle = "#ffffff";
-      context.rect(0, 0, 300, 300);
-      context.fill();
+    var isRec = false,
+        newDraw = false,
+        posX = [],
+        posY = []
+
+    // При нажатии на мышь
+    canvas.addEventListener("touchstart", (e) => {
+        if (isRec) return;
+        clearCanvas();
+        canvas.ontouchmove = (e) => recordMousePos(e);
+    });
+
+    // Когда мышь отпущена
+    canvas.addEventListener("touchend", () => stopDrawing());
+
+
+    // Добавляем позиции X и Y мыши в массимы arrayX и arrayY
+    function recordMousePos(e) {
+        posX.push(e.clientX);
+        posY.push(e.clientY);
+        drawLine(e.clientX, e.clientY);
     }
-  
-    function dot(x,y) {
-      context.beginPath();
-      context.fillStyle = "#000000";
-      context.arc(x,y,1,0,Math.PI*2,true);
-      context.fill();
-      context.stroke();
-      context.closePath();
+
+    // Рисование линий
+    function drawLine(x, y) {
+        ctx.lineTo(x, y);
+        ctx.stroke();
     }
-  
-    function line(fromx,fromy, tox,toy) {
-      context.beginPath();
-      context.moveTo(fromx, fromy);
-      context.lineTo(tox, toy);
-      context.stroke();
-      context.closePath();
+
+    // Очистить холст
+    function clearCanvas() {
+        if(newDraw) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            newDraw = false;
+            if(sketch != null) {
+                sketch.style.visibility = 'visible';
+            }
+        }
+        ctx.beginPath();
     }
-  
-    canvas.ontouchstart = function(event){                   
-      event.preventDefault();                 
-      
-      lastx = event.touches[0].clientX;
-      lasty = event.touches[0].clientY - canvastop;
-  
-      dot(lastx,lasty);
+
+    // Остановка рисования
+    function stopDrawing() {
+        canvas.ontouchmove = null;
+        posX.push(undefined);
+        posY.push(undefined);
     }
-  
-    canvas.ontouchmove = function(event){                   
-      event.preventDefault();                 
-  
-      var newx = event.touches[0].clientX;
-      var newy = event.touches[0].clientY - canvastop;
-  
-      line(lastx,lasty, newx,newy);
-      
-      lastx = newx;
-      lasty = newy;
+
+    // Изменить цвет индикатора
+    function switchIndicator(enable) {
+        if(enable) {
+            indicator.classList.add('isWrite');
+        }else {
+            indicator.classList.remove('isWrite');
+        }
     }
-  
-  
-    var clearButton = document.getElementById('clear')
-    clearButton.onclick = clear
-  
-    clear()
-  }
+
+    
+}
